@@ -1,0 +1,19 @@
+{
+  "name": "l-bracket",
+  "datum": "Bottom-left corner of the FRONT view at the sketch origin (0, 0, 0). Z is the extrusion axis. All dimensions in millimetres with a decimal point.",
+  "profile": "L-bracket: a 60 x 3 mm foot strip along X, and a 40 mm high wall (3 mm wide) rising from the left end of the foot. Closed polyline in the XY plane.",
+  "constraints": {
+    "foot_length": 60.0,
+    "foot_thickness": 3.0,
+    "wall_height": 40.0,
+    "wall_thickness": 3.0
+  },
+  "thickness": 3.0,
+  "expected": {
+    "bounding_box": { "x": 60.0, "y": 40.0, "z": 3.0 },
+    "volume": 873.0,
+    "solid": true,
+    "closed": true,
+    "watertight": true
+  }
+}

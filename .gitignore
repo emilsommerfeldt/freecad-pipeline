@@ -1,0 +1,4 @@
+*.FCStd
+*.stl
+*.verification.json
+__pycache__/

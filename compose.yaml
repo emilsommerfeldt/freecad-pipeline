@@ -1,0 +1,10 @@
+# TrueNAS SCALE 24.10+ — Apps > Discover > Install via YAML
+# Replace <pool> with your pool name before applying.
+services:
+  freecad-builder:
+    image: ghcr.io/emilsommerfeldt/freecad-pipeline:latest
+    container_name: freecad-builder
+    restart: unless-stopped
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    volumes:
+      - /mnt/<pool>/apps/freecad/models:/models
