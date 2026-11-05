@@ -27,11 +27,11 @@ RUN set -eux; \
     curl -fsSL -o "/tmp/${appimage}" \
         "https://github.com/FreeCAD/FreeCAD/releases/download/${FREECAD_VERSION}/${appimage}"; \
     extracted=""; \
-    for offset in $$(grep -abo hsqs "/tmp/${appimage}" | cut -d: -f1 | sort -rn); do \
+    for offset in $(grep -abo hsqs "/tmp/${appimage}" | cut -d: -f1 | sort -rn); do \
         rm -rf /tmp/sqfs; \
-        if unsquashfs -q -o "$${offset}" -d /tmp/sqfs "/tmp/${appimage}"; then extracted=1; break; fi; \
+        if unsquashfs -q -o "${offset}" -d /tmp/sqfs "/tmp/${appimage}"; then extracted=1; break; fi; \
     done; \
-    test -n "$${extracted}"; \
+    test -n "${extracted}"; \
     mv /tmp/sqfs /opt/freecad; \
     rm -f "/tmp/${appimage}"; \
     apt-get autoremove -y; \
