@@ -1,5 +1,6 @@
 # TrueNAS SCALE 24.10+ — Apps > Discover > Install via YAML
-# Replace <pool> with your pool name before applying.
+# Replace <pool> with your pool name and CHANGE_ME with a generated token
+# (openssl rand -hex 32) before applying.
 services:
   freecad-builder:
     image: ghcr.io/emilsommerfeldt/freecad-pipeline:latest
@@ -8,3 +9,19 @@ services:
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
     volumes:
       - /mnt/<pool>/apps/freecad/models:/models
+
+  # MCP endpoint for remote Vibe Work sessions. Publishes only to the
+  # NAS loopback; expose it to the internet solely through an encrypted,
+  # access-controlled tunnel (see DEPLOY.md).
+  freecad-mcp:
+    image: ghcr.io/emilsommerfeldt/freecad-pipeline:latest
+    container_name: freecad-mcp
+    restart: unless-stopped
+    entrypoint: ["/opt/freecad/usr/bin/python", "/opt/freecad-pipeline/mcp_server.py"]
+    environment:
+      FREECAD_MCP_TOKEN: "CHANGE_ME"
+      MODELS_DIR: "/models"
+    volumes:
+      - /mnt/<pool>/apps/freecad/models:/models
+    ports:
+      - "127.0.0.1:8410:8410"

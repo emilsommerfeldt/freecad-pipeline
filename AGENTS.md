@@ -51,3 +51,16 @@ Scope split: Vibe Work owns sketch interpretation, verification review, and 3D p
 3. `docker exec freecad-builder freecadcmd /models/build_part.py` produces the FCStd, the binary STL, and an all-green verification table for the L-bracket: bbox 60 x 40 x 3 mm, volume 873 mm^3, solid and closed.
 4. The STL is watertight (verify with the FreeCAD Mesh module or an equivalent checker in the script).
 5. Re-running the build is bit-for-bit reproducible from the same spec file.
+
+## 6. Revision: remote MCP access (supersedes part of section 4)
+
+The user later required remote access from Vibe Work while away from the LAN.
+The pipeline now ships `mcp_server.py` (Streamable HTTP MCP, bearer-token
+auth, tools: `build_part`, `list_parts`, `get_stl`, `get_verification`),
+run by a second compose service `freecad-mcp` from the same image. The
+`freecad-builder` container itself remains listener-free. The MCP service
+publishes only to the NAS loopback (`127.0.0.1:8410`) and is reachable from
+outside the LAN solely through an encrypted, access-controlled tunnel
+(Tailscale Funnel or Cloudflare Tunnel) plus the token — never a raw
+published port or router port-forward. The MCP bridge restriction in section 4
+(spkane bridge, ports 9875/9876) still applies unchanged.

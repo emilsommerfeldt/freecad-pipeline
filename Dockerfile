@@ -37,14 +37,16 @@ RUN set -eux; \
 # freecadcmd wrapper on PATH pointing into the extracted AppImage.
 RUN printf '#!/bin/sh\nexec /opt/freecad/usr/bin/freecadcmd "$@"\n' \
         > /usr/local/bin/freecadcmd \
-    && chmod 0755 /usr/local/bin/freecadcmd
+    && chmod 0755 /usr/local/bin/freecadcmd \
+    && /opt/freecad/usr/bin/python -m pip install --no-cache-dir \
+        --target /opt/pydeps fastmcp
 
 # Non-root user; /models is the working volume for specs and outputs.
 RUN useradd --create-home --uid 1000 --shell /bin/bash builder \
     && mkdir -p /models /opt/freecad-pipeline \
     && chown builder:builder /models /opt/freecad-pipeline
 
-COPY --chown=builder:builder build_part.py spec.json /opt/freecad-pipeline/
+COPY --chown=builder:builder build_part.py mcp_server.py spec.json /opt/freecad-pipeline/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod 0755 /usr/local/bin/entrypoint.sh
 

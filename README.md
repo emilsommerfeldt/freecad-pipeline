@@ -16,8 +16,10 @@ installation.
 | `Dockerfile` | Debian 13 (trixie), FreeCAD 1.1.4 (official AppImage, extracted), `freecadcmd` on PATH, non-root user |
 | `entrypoint.sh` | Seeds `/models` with the build script and spec, then `sleep infinity` |
 | `build_part.py` | Builds the spec, verifies it, exports FCStd/STL/verification JSON |
+| `mcp_server.py` | MCP endpoint (Streamable HTTP + bearer token) wrapping the build CLI for remote Vibe Work sessions |
+| `entrypoint.sh` | Seeds `/models` with the build script and spec, then `sleep infinity` |
 | `spec.json` | Sample spec: the L-bracket |
-| `compose.yaml` | TrueNAS SCALE 24.10+ Install-via-YAML Compose file |
+| `compose.yaml` | TrueNAS SCALE 24.10+ Install-via-YAML Compose file (builder + MCP services) |
 | `.github/workflows/docker-image.yml` | CI: smoke test, then multi-arch (amd64/arm64) push to GHCR |
 
 ## Build script contract
@@ -35,6 +37,16 @@ installation.
 - exits non-zero on any mismatch or failed check,
 - produces bit-for-bit identical FCStd/STL outputs for the same spec
   (timestamps inside the FCStd are normalized).
+
+## Remote access (Vibe Work)
+
+The `freecad-mcp` service exposes the pipeline as an MCP server
+(Streamable HTTP at `/mcp`, bearer-token auth) so remote Vibe Work sessions
+can build parts and fetch STLs. It publishes only to the NAS loopback;
+reach it through an encrypted, access-controlled tunnel (Tailscale Funnel or
+Cloudflare Tunnel — see `DEPLOY.md`), then register it as a custom MCP
+connector in the Studio. Tools: `build_part`, `list_parts`, `get_stl`,
+`get_verification`.
 
 ## Local test
 

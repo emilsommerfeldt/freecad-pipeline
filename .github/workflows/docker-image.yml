@@ -46,7 +46,38 @@ jobs:
           docker exec freecad-builder test -s /models/l-bracket.verification.json
           python3 -c \
             "import json,sys; r=json.load(open('$RUNNER_TEMP/models/l-bracket.verification.json')); sys.exit(0 if r['all_pass'] else 1)"
-          docker rm -f freecad-builder
+
+      - name: MCP endpoint smoke test
+        run: |
+          docker run -d --name freecad-mcp \
+            -e FREECAD_MCP_TOKEN=ci-token \
+            -v "$RUNNER_TEMP/models:/models" \
+            -p 127.0.0.1:8410:8410 \
+            --entrypoint /opt/freecad/usr/bin/python \
+            freecad-builder:smoke /opt/freecad-pipeline/mcp_server.py
+          for i in $(seq 1 30); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8410/mcp)" = "401" ] && break
+            sleep 2
+          done
+          curl -s -o /dev/null -w 'no-token=%{http_code}\n' http://127.0.0.1:8410/mcp | grep -q 'no-token=401'
+          pip install fastmcp
+          python3 -c '
+          import asyncio, json, os
+          from fastmcp import Client
+          from fastmcp.client.auth import BearerAuth
+
+          async def main():
+              async with Client("http://127.0.0.1:8410/mcp",
+                                auth=BearerAuth(token="ci-token")) as c:
+                  spec = json.load(open(os.environ["RUNNER_TEMP"] + "/models/spec.json"))
+                  r = await c.call_tool("build_part", {"spec": spec})
+                  d = r.data if isinstance(r.data, dict) else json.loads(r.content[0].text)
+                  assert d.get("all_pass") is True, d
+                  print("MCP build_part: all_pass")
+
+          asyncio.run(main())
+          '
+          docker rm -f freecad-mcp
 
   publish:
     needs: smoke-test
