@@ -11,7 +11,11 @@ VM before any change. The TrueNAS option is kept for completeness.
 
 On Proxmox, create a VM (not a container, for the strongest isolation):
 
-- Debian 13 (trixie) netinst, 2 vCPU, 4 GB RAM, 20+ GB disk
+- Ubuntu Server 22.04 LTS (the `ubuntu-22.04.5-live-server-amd64.iso`
+  works as-is) or Debian 13 netinst — either is fine, because FreeCAD,
+  Python, and the MCP server all run inside the container image; the VM
+  only provides Docker
+- 2 vCPU, 4 GB RAM, 20+ GB disk
 - No special roles; a basic server install with SSH
 
 Take a Proxmox snapshot once the base install works — you can always roll
