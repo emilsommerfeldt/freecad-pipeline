@@ -64,3 +64,14 @@ outside the LAN solely through an encrypted, access-controlled tunnel
 (Tailscale Funnel or Cloudflare Tunnel) plus the token — never a raw
 published port or router port-forward. The MCP bridge restriction in section 4
 (spkane bridge, ports 9875/9876) still applies unchanged.
+
+## 7. Revision: deployment target (supersedes the TrueNAS-only framing)
+
+The user rejected running the tunnel on the NAS (attack surface on the
+storage host) and the deployment target is now a dedicated Debian 13 Proxmox
+VM running Docker: the repo stack via `docker compose up -d`, Tailscale
+installed inside the VM with `tailscale funnel http://localhost:8410`, and
+the `freecad-mcp` endpoint registered as a custom MCP connector in the
+Mistral Studio. TrueNAS SCALE remains an optional target (Option B in
+DEPLOY.md). Everything else in this brief (build contract, verification,
+no exposed ports on the builder, non-root, no secrets) is unchanged.

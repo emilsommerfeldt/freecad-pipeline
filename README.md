@@ -19,7 +19,7 @@ installation.
 | `mcp_server.py` | MCP endpoint (Streamable HTTP + bearer token) wrapping the build CLI for remote Vibe Work sessions |
 | `entrypoint.sh` | Seeds `/models` with the build script and spec, then `sleep infinity` |
 | `spec.json` | Sample spec: the L-bracket |
-| `compose.yaml` | TrueNAS SCALE 24.10+ Install-via-YAML Compose file (builder + MCP services) |
+| `compose.yaml` | Docker Compose stack: builder + MCP services (Proxmox VM recommended, TrueNAS SCALE optional) |
 | `.github/workflows/docker-image.yml` | CI: smoke test, then multi-arch (amd64/arm64) push to GHCR |
 
 ## Build script contract
@@ -45,7 +45,8 @@ The `freecad-mcp` service exposes the pipeline as an MCP server
 can build parts and fetch STLs. It publishes only to the NAS loopback;
 reach it through an encrypted, access-controlled tunnel (Tailscale Funnel or
 Cloudflare Tunnel — see `DEPLOY.md`), then register it as a custom MCP
-connector in the Studio. Tools: `build_part`, `list_parts`, `get_stl`,
+connector in the Studio. Recommended deployment is a dedicated Proxmox VM so
+the NAS and LAN stay out of the attack surface. Tools: `build_part`, `list_parts`, `get_stl`,
 `get_verification`.
 
 ## Local test
