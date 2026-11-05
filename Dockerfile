@@ -20,17 +20,16 @@ RUN set -eux; \
     esac; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-        ca-certificates curl xz-utils libfuse2 \
+        ca-certificates curl squashfs-tools \
         libgl1 libglu1-mesa libxkbcommon0 libxi6 libxrender1 \
         libsm6 libice6 libfontconfig1 libdbus-1-3 libxext6; \
     appimage="FreeCAD_${FREECAD_VERSION}-Linux-${FREECAD_ARCH}-py311.AppImage"; \
     curl -fsSL -o "/tmp/${appimage}" \
         "https://github.com/FreeCAD/FreeCAD/releases/download/${FREECAD_VERSION}/${appimage}"; \
-    chmod +x "/tmp/${appimage}"; \
-    "/tmp/${appimage}" --appimage-extract >/dev/null; \
-    mv squashfs-root /opt/freecad; \
+    offset=$(grep -abo hsqs "/tmp/${appimage}" | head -n1 | cut -d: -f1); \
+    test -n "${offset}"; \
+    unsquashfs -q -o "${offset}" -d /opt/freecad "/tmp/${appimage}"; \
     rm -f "/tmp/${appimage}"; \
-    apt-get purge -y libfuse2; \
     apt-get autoremove -y; \
     rm -rf /var/lib/apt/lists/*
 
